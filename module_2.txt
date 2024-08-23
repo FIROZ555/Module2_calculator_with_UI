@@ -1,0 +1,106 @@
+import java.awt.*;
+import java.awt.event.*;
+
+public class Calculator implements ActionListener {
+    private Frame frame;
+    private TextField display;
+    private Panel panel;
+    private String firstOperand, secondOperand;
+    private int operator;
+
+    public Calculator() {
+        setupUI();
+    }
+
+    private void setupUI() {
+        frame = new Frame("Calculator");
+        frame.setLayout(new FlowLayout());
+
+        display = new TextField(20);
+        frame.add(display);
+
+        panel = new Panel();
+        panel.setLayout(new GridLayout(4, 4, 10, 20));
+
+        String[] buttonLabels = {
+            "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+            "+", "-", "*", "/", "C", "=", "."
+        };
+
+        for (String label : buttonLabels) {
+            Button button = new Button(label);
+            button.addActionListener(this);
+            panel.add(button);
+        }
+
+        frame.add(panel);
+        frame.setSize(300, 300);
+        frame.setVisible(true);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        if (isNumeric(command)) {
+            display.setText(display.getText() + command);
+        } else if (command.equals(".")) {
+            display.setText(display.getText() + ".");
+        } else if (command.equals("C")) {
+            display.setText("");
+        } else if (command.equals("=")) {
+            performCalculation();
+        } else {
+            operator = getOperator(command);
+            firstOperand = display.getText();
+            display.setText("");
+        }
+    }
+
+    private boolean isNumeric(String command) {
+        return command.matches("\\d");
+    }
+
+    private int getOperator(String command) {
+        switch (command) {
+            case "+": return 1;
+            case "-": return 2;
+            case "*": return 3;
+            case "/": return 4;
+            default: return -1;
+        }
+    }
+
+    private void performCalculation() {
+        secondOperand = display.getText();
+
+        try {
+            double num1 = Double.parseDouble(firstOperand);
+            double num2 = Double.parseDouble(secondOperand);
+            double result = 0;
+
+            switch (operator) {
+                case 1: result = num1 + num2; break;
+                case 2: result = num1 - num2; break;
+                case 3: result = num1 * num2; break;
+                case 4:
+                    if (num2 != 0) {
+                        result = num1 / num2;
+                    } else {
+                        display.setText("Error");
+                        return;
+                    }
+                    break;
+                default: break;
+            }
+
+            display.setText(String.valueOf(result));
+        } catch (NumberFormatException ex) {
+            display.setText("Error");
+        }
+    }
+
+    public static void main(String[] args) {
+        new Calculator();
+    }
+}
